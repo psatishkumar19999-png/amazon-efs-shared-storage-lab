@@ -1,0 +1,8 @@
+Amazon EFS 
+|
+EC2- PROD
+EC2- DEV
+EC2- STAG
+|
+This 3 instances will be sharing the same EFS Storage.
+We have the same copy in the 3 instance. If we made any changes in any instance it will reflect to the rest 2-instaces. So same copy for all 3 instances.
