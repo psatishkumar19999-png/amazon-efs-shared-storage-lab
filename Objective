@@ -1,0 +1,3 @@
+Create a centralized shared storage solution using Amazon EFS and mount it on multiple EC2 instances (Prod, Dev, and Stage).
+
+Any file created or modified from one instance should be immediately accessible from the other instances.
