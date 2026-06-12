@@ -1,0 +1,84 @@
+Prerequisites
+
+Three EC2 instances (RHEL)
+Instances deployed within the same VPC
+SSH access using a PEM key
+Amazon EFS File System
+EFS Security Group allowing NFS access (TCP 2049)
+
+EFS Details
+Parameter	Value
+File System ID	fs-0743fa78e8d7ca1f1
+Mount Path	/home/ec2-user/shared
+Protocol	NFSv4.1
+Encryption	TLS
+Security Group Configuration
+EC2 Security Group
+Type	Port	Source
+SSH	22	Administrator IP
+EFS Security Group
+Type	Port	Source
+NFS	2049	EC2 Security Group
+
+Note: For learning purposes, 0.0.0.0/0 can be used temporarily. In production environments, restrict access to the EC2 Security Group.
+
+Installation Steps
+1. Install EFS Utilities
+sudo yum install -y amazon-efs-utils
+
+Verify installation:
+
+which mount.efs
+
+Expected output:
+
+/usr/sbin/mount.efs
+2. Create Mount Directory
+sudo mkdir -p /home/ec2-user/shared
+3. Mount EFS
+sudo mount -t efs fs-0743fa78e8d7ca1f1:/ /home/ec2-user/shared
+4. Verify Mount
+mount | grep shared
+
+Expected output:
+
+127.0.0.1:/ on /home/ec2-user/shared type nfs4 (...)
+5. Test Shared Storage
+
+Create a file:
+
+echo "Hello from Prod" > /home/ec2-user/shared/prod.txt
+
+Verify:
+
+ls -l /home/ec2-user/shared
+cat /home/ec2-user/shared/prod.txt
+Configure Automatic Mounting
+
+Edit /etc/fstab:
+
+sudo vi /etc/fstab
+
+Add the following line:
+
+fs-0743fa78e8d7ca1f1:/ /home/ec2-user/shared efs defaults,_netdev,tls 0 0
+
+Save and exit.
+
+Validate /etc/fstab
+sudo mount -a
+
+No output indicates successful validation.
+
+Verify Persistence After Reboot
+sudo reboot
+
+After reconnecting:
+
+mount | grep shared
+ls /home/ec2-user/shared
+
+Expected output:
+
+127.0.0.1:/ on /home/ec2-user/shared type nfs4 (...)
+prod.txt
